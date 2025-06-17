@@ -1,6 +1,16 @@
 # Get the directory of the script
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $logFile = Join-Path $scriptDirectory "NinjaRMMAgent.log"
+$maxLogSizeMB = 25
+
+# Check log file size and truncate if necessary
+if (Test-Path $logFile) {
+    $logSizeMB = (Get-Item $logFile).Length / 1MB
+    if ($logSizeMB -ge $maxLogSizeMB) {
+        Clear-Content $logFile
+        Add-Content -Path $logFile -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') - Log file exceeded ${maxLogSizeMB}MB and was truncated.`n"
+    }
+}
 
 # Function to log messages with timestamp
 function Write-Log {
